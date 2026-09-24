@@ -1,74 +1,100 @@
 # Project
 
-New project. No application code yet. When the stack is chosen, update Stack, Folder Map and Commands in the same commit that introduces it.
+Not set. When this template is applied to a real repository, fill Project, Stack, Folder Map and Commands from verified inspection only.
 
 # Stack
 
-None yet.
+Not set.
 
 # Folder Map
 
-- `AGENTS.md`: rules for every agent (this file). Claude Code loads it through `CLAUDE.md`.
-- `TASK.md`: brief for the current significant task. Overwrite per task.
-- `FRICTION.md`: log of repeated workflow friction.
-- `.codex/config.toml`: project-local Codex settings.
+Not set.
 
 # Commands
 
-None exist yet: no dev, test, lint, typecheck or build command. Do not invent them. Add a command here only after it has run successfully in this repo.
+Not set. Add a dev, test, lint, typecheck or build command only after it has run successfully in this repo. Never invent one.
 
-# Coding Rules
+# Windows
 
-- Make the smallest correct change. No unrelated refactors, cleanup or file edits.
+In PowerShell, call `npm.cmd`, `npx.cmd` and `codex.cmd`. The execution policy and Codex's sandbox block the `.ps1` launchers. Keep sandbox protections intact.
+
+# Mobile Sync
+
+- Phone and iPad see a one-way copy of this repo in OneDrive: `C:\Users\Madison\OneDrive\AgentWorkspace\<repo folder name>` (OneDrive app → AgentWorkspace). It excludes `.git`, `node_modules`, `.env*`, `*.pem` and `*.key`.
+- Save and edit files only in this repo, never in the OneDrive copy. Edits made in the copy are not synced back and get overwritten. Files deleted in the repo stay in the copy until removed there by hand.
+- After each commit, Claude or the user refreshes the copy. Codex's sandbox cannot write to OneDrive. Exit codes 0–7 mean success:
+  `$r = (git rev-parse --show-toplevel) -replace '/','\'; if ($env:OneDrive) { robocopy $r "$env:OneDrive\AgentWorkspace\$(Split-Path -Leaf $r)" /E /XD .git node_modules /XF .env* *.pem *.key /NFL /NDL /NJH /NJS /NP }`
+- Never copy secrets or patient data. If the working tree contains any, do not run the command.
+
+# Scope
+
+- Single agent by default. Delegate only when it clearly helps the task.
+- Make the smallest correct change. No unrelated refactors, renames, reorganisation or cleanup.
+- Do not modify files unrelated to the task.
+- Inspect files, config, scripts, tests and Git state before assuming. Never invent commands, paths, APIs, behaviour or business rules.
 - Preserve existing architecture unless the task requires changing it.
-- Inspect existing patterns and utilities before adding new ones.
-- Add a dependency only if the project lacks the capability and a small implementation is not simpler; check compatibility and maintenance first. Never upgrade unrelated dependencies; upgrades are their own task.
-- Never weaken security, validation or tests to make checks pass.
-- Never invent commands, paths, APIs, library behaviour or business rules. If something material is unverified, report UNKNOWN (what is uncertain), CHECKED (what you inspected), NEEDED (what would resolve it).
 
-# Git / Safety
+# Routing
 
-- Run `git status` before significant work. Never overwrite, reset or discard uncommitted work you did not make.
-- Verify, then commit one logical change. Keep features, fixes, refactors, formatting and dependency changes in separate commits.
-- Never print, paste into prompts, or commit secrets: keys, tokens, passwords, `.env` values, certificates, user data.
-- Do not edit generated or vendored files unless necessary.
-
-# Risky Changes
-
-These need a plan in TASK.md and a Claude review of the diff before commit:
-authentication, authorisation, payments, sensitive or user data, database schema or migrations, destructive operations, security-sensitive code, important business logic, infrastructure or deployment, major dependency changes, concurrency or state consistency, production-facing external APIs.
-
-# Task Routing
-
-One agent per task by default. Hand-offs carry TASK.md and file paths, never reasoning history.
-
-- Trivial (typo, rename, formatting, isolated UI or test tweak): change → targeted check → commit. No plan.
-- Normal and clear: Codex implements → relevant checks → commit.
-- Complex or ambiguous: Claude plans and writes TASK.md → Codex implements → verify → commit.
-- Risky: as complex, then Claude reviews TASK.md, `git diff`, changed files and tests → fix → re-verify → commit.
+- Trivial (typo, simple rename, formatting, tiny isolated change): one agent → change → targeted check → commit. No plan.
+- Normal and clear: Codex implements → verify → commit.
+- Complex or ambiguous: Claude plans → TASK.md → Codex implements → verify → commit.
+- Risky: Claude plans → TASK.md → Codex implements → automated checks → Claude reviews TASK.md, `git diff`, changed files and relevant tests → fix → final verification → commit.
+- Hand Codex only the goal, relevant paths, constraints, out-of-scope items, acceptance criteria and verification. Never reasoning history.
+- When Claude hands work to Codex, Codex does not commit; Claude verifies, reviews if risky, and commits.
 
 # Effort
 
-- Codex: medium reasoning by default (`.codex/config.toml`, applied only once Codex trusts this folder; otherwise pass `-c model_reasoning_effort=medium`). Use high after one reasonable failure or for genuinely hard or risky work. Never default to max.
-- Claude: efficient model for routine work. Strongest model only for hard architecture, ambiguous planning, risky or security review, and cross-cutting failures.
-
-# Failure Handling
-
-Check fails → diagnose → one focused repair → re-check. Still failing → stop patching. Roll back only your own changes to the last good commit, never unrelated work, if the approach is wrong, regressions spread or risky logic was damaged; otherwise escalate to Claude planning.
+- Claude: efficient general model at medium effort for routine work. Strongest model at high effort for hard architecture, ambiguous requirements, important planning, risky or security review, and cross-cutting debugging. Go beyond high only when the problem shows the need.
+- Codex: its current default coding model at medium reasoning. Use high when one reasonable attempt failed, debugging is hard, several systems interact, or being wrong is costly. Never above high by default. `.codex/config.toml` sets medium, but Codex applies it only once it trusts the folder; otherwise pass `-c model_reasoning_effort=medium`.
 
 # Context
 
 - One task per session; clear context between unrelated tasks.
-- Reference file paths instead of pasting files. Trim logs to the relevant error and stack trace.
-- Run targeted checks and review diffs, not the whole repo. Stop when Done When is met.
+- Reference file paths instead of pasting files. Trim logs to the relevant errors.
+- Do not plan obvious tasks, delegate trivial ones, or have two models solve the same easy problem.
+- Use targeted checks, review diffs rather than the whole repo, and stop when acceptance criteria are met.
+
+# Git and Working Tree
+
+- Run `git status` before significant work. Never assume existing changes belong to your task.
+- Never overwrite, revert, discard or commit unrelated changes. Isolate your task's changes.
+- Verify, then commit one coherent logical change.
+- Never run `git reset --hard` or anything equivalent over unrelated work.
+- TASK.md may be overwritten per task, but first check that it holds no uncommitted manual edits. Commit it with the task it describes.
+
+# Failure Handling
+
+Verification fails → diagnose → one focused repair → verify again. Fails again → stop, then roll back this task's changes or escalate to stronger reasoning or planning. Roll back immediately if the approach is wrong, regressions are widespread, the architecture was misunderstood, risky logic was damaged, or more patching would add complexity.
+
+# Dependencies
+
+- Use existing capabilities first; prefer a small implementation when it is simpler.
+- Add a dependency only when justified, compatible, maintained and established.
+- No unrelated upgrades. Broad upgrades are their own task.
+
+# Security
+
+- Never expose, paste into prompts, or commit API keys, passwords, tokens, production credentials, private certificates, or confidential user or customer data.
+- Never weaken security or validation to make a test pass.
+- Do not edit generated or vendored files unless necessary.
+
+# Risky Changes
+
+Authentication, authorisation, payments, sensitive or user data, database schema or migrations, destructive operations, security-sensitive code, important business logic, concurrency or state consistency, infrastructure or deployment, major dependencies, production-facing external API behaviour.
+
+# Uncertainty
+
+If something material is unverified, report UNKNOWN (what is uncertain), CHECKED (what was inspected) and NEEDED (what would resolve it). Do not guess.
 
 # Friction
 
-Log real, repeated workflow annoyances in FRICTION.md. Consider a workflow change only at count 3+, and only if it is justified.
+Log real friction in FRICTION.md. Count 1: log it, take no action. Count 2: observe. Count 3+: investigate whether a change is justified and is the simplest fix.
 
 # Definition of Done
 
 - Requested behaviour works.
-- Relevant tests, lint, typecheck and build pass, or are recorded as not existing yet.
-- No known regression, and scope was respected.
-- Risky changes had a Claude diff review.
+- Appropriate verification passes.
+- No known regression was introduced.
+- Scope was respected.
+- Risky work received a Claude diff review.

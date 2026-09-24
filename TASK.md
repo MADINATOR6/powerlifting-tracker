@@ -1,21 +1,21 @@
 # Task
 
-<!-- Temporary task state. Overwrite for each significant task. Use file paths, not pasted code. -->
+<!-- Temporary state for complex or risky tasks. May be overwritten per task after checking it holds no uncommitted manual edits. Reference paths; do not paste files. -->
 
 ## Goal
-<!-- What needs to be accomplished. -->
+<!-- What must be accomplished. -->
 
 ## Relevant Files
-<!-- Only the likely relevant paths. -->
+<!-- Only likely relevant files/directories. -->
 
 ## Constraints
-<!-- Requirements and things that must not change. -->
+<!-- Important requirements and things that must not change. -->
 
 ## Out of Scope
-<!-- Adjacent work that must not be done. -->
+<!-- Adjacent work that must NOT be done. -->
 
 ## Done When
 <!-- Concrete acceptance criteria. -->
 
 ## Verify
-<!-- Commands or checks proving the task works. -->
+<!-- Commands/checks proving the task works. -->
