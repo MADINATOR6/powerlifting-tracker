@@ -8,11 +8,17 @@
   <link rel="icon" href="./icons/icon-192.png" type="image/png">
   <link rel="manifest" href="./manifest.json">
   <link rel="stylesheet" href="./style.css">
+  <script defer src="./vendor/chart.umd.min.js"></script>
   <script defer src="./app.js"></script>
 </head>
 <body>
   <main>
     <h1>Powerlifting Tracker</h1>
+    <nav class="tabs" aria-label="Screens">
+      <button type="button" data-screen="log" aria-pressed="true">Log</button>
+      <button type="button" data-screen="analyst" aria-pressed="false">Analyst</button>
+    </nav>
+    <div id="screen-log">
     <p>Log your next set. All weights in kg.</p>
     <form id="set-form" novalidate>
       <fieldset>
@@ -84,6 +90,27 @@
       </div>
       <p id="settings-message" role="alert"></p>
     </details>
+    </div>
+    <div id="screen-analyst" hidden>
+      <p id="analyst-empty" hidden>No sets logged yet. Log a set to see your analysis.</p>
+      <div id="analyst-content" hidden>
+        <h2>PR board</h2>
+        <table id="pr-board">
+          <thead><tr><th scope="col">Lift</th><th scope="col">Best e1RM</th><th scope="col">Heaviest set</th></tr></thead>
+          <tbody></tbody>
+        </table>
+        <p id="charts-unavailable" hidden>Charts are unavailable.</p>
+        <div id="analyst-charts">
+          <h2>e1RM over time</h2>
+          <div class="chart-box"><canvas id="e1rm-chart" role="img" aria-label="Best daily estimated one-rep max by lift"></canvas></div>
+          <h2>Weekly tonnage</h2>
+          <div class="chart-box"><canvas id="tonnage-chart" role="img" aria-label="Weekly weight lifted by lift"></canvas></div>
+          <h2>Lift balance</h2>
+          <p id="balance-note"></p>
+          <div class="chart-box"><canvas id="balance-chart" role="img" aria-label="Your lift shares compared with typical shares"></canvas></div>
+        </div>
+      </div>
+    </div>
   </main>
 </body>
 </html>

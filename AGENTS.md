@@ -5,7 +5,7 @@ Powerlifting Tracker: a mobile-first, offline-capable Progressive Web App for pe
 Direction: Liftoff-style powerlifting app with three pillars: Intelligent Coach, Powerlifting Analyst, Meet-Day tools. Delivered in milestones:
 - M1 (done): app shell, squat/bench/deadlift set logger (weight × reps), e1RM, IndexedDB persistence, JSON export.
 - M2 (done): Intelligent Coach core: optional per-set RPE (setting, default off), double-progression target per lift from its last session, 5% next-set drop after RPE 9+.
-- M3: Analyst dashboard: vendored Chart.js, e1RM line chart, weekly tonnage bars, squat/bench/deadlift imbalance radar, PR board with total.
+- M3 (done): Analyst dashboard (second screen): vendored Chart.js, e1RM line chart, weekly tonnage bars, squat/bench/deadlift imbalance radar, PR board with total.
 - M4: Recovery heatmap: inline SVG body map (front/back) coloured by muscle-group fatigue.
 - M5: Meet-day tools: attempt calculator, warm-up generator, weight-class manager.
 - Later: deload coach, JSON import, quick-entry polish.
@@ -23,7 +23,9 @@ Hard constraints: no build step, no framework, no `package.json`, no `node_modul
 # Folder Map
 
 - `AGENTS.md`, `CLAUDE.md`, `BOOTSTRAP.md`, `FRICTION.md`, `TASK.md`, `.codex/`: workflow files from the template. Only AGENTS.md and TASK.md change for app work.
-- App files at the repo root: `index.html`, `app.js`, `style.css`, `manifest.json`, `service-worker.js`, `icons/`. A vendored Chart.js goes in `vendor/` from M3.
+- App files at the repo root: `index.html`, `app.js`, `style.css`, `manifest.json`, `service-worker.js`, `icons/`.
+- `vendor/`: `chart.umd.min.js` (Chart.js 4.5.1 UMD, from the npm tarball) and its MIT licence `chart.js-LICENSE.md`. Never edit; replace only as a deliberate upgrade.
+- Bump `CACHE` in `service-worker.js` (currently `pl-shell-v2`) whenever a shell file changes, or installed apps keep the old version.
 
 # Commands
 

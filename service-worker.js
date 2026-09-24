@@ -1,7 +1,7 @@
 "use strict";
-const CACHE = "pl-shell-v1";
+const CACHE = "pl-shell-v2";
 const SHELL = ["./", "./index.html", "./app.js", "./style.css", "./manifest.json",
-  "./icons/icon-192.png", "./icons/icon-512.png"];
+  "./icons/icon-192.png", "./icons/icon-512.png", "./vendor/chart.umd.min.js"];
 
 self.addEventListener("install", event => {
   event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(SHELL)));
