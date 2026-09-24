@@ -11,7 +11,7 @@ Apply the lightweight workflow from `C:\Users\Madison\code\claude-codex-template
 2. Bring in AGENTS.md, CLAUDE.md, TASK.md, FRICTION.md and .codex/config.toml from the template. If a file already exists here, merge it: keep project-specific content, add missing workflow rules, remove only exact duplicates. For an existing CLAUDE.md, put `@AGENTS.md` first and keep its Claude-specific lines. Never overwrite blindly.
 3. Inspect read-only, skipping node_modules, vendor, dist, build, coverage and generated output: languages, frameworks, package manager, database, important folders, and the real dev/test/lint/typecheck/build commands from manifests, scripts and CI config.
 4. Run those commands where practical and safe. Record only commands that ran successfully; list missing or failing ones separately. Do not add placeholder tests or tooling.
-5. Fill Project, Stack, Folder Map and Commands in AGENTS.md concisely. Keep the workflow sections unchanged; merged project-specific rules may stay.
+5. Fill Project, Stack, Folder Map and Commands in AGENTS.md concisely, and change the Mobile Sync folder name to this repo's folder name. Keep the workflow sections unchanged; merged project-specific rules may stay.
 6. Report: files added or merged, verified commands, missing verification, UNKNOWN / CHECKED / NEEDED items, and `git status`. Do not commit unless asked.
 7. Remind me to open the repository in Codex once and trust it, so `.codex/config.toml` applies.
 

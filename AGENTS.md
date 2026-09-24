@@ -16,11 +16,11 @@ Not set. Add a dev, test, lint, typecheck or build command only after it has run
 
 # Windows
 
-In PowerShell, call `npm.cmd`, `npx.cmd` and `codex.cmd`. The execution policy and Codex's sandbox block the `.ps1` launchers. Keep sandbox protections intact.
+In PowerShell, always call `codex.cmd`, `npm.cmd` and `npx.cmd`, never plain `codex`, `npm` or `npx`. The execution policy and Codex's sandbox block the `.ps1` launchers that plain names resolve to. Keep sandbox protections intact.
 
 # Mobile Sync
 
-- Phone and iPad see a one-way copy of this repo in OneDrive: `C:\Users\Madison\OneDrive\AgentWorkspace\<repo folder name>` (OneDrive app → AgentWorkspace). It excludes `.git`, `node_modules`, `.env*`, `*.pem` and `*.key`.
+- Phone and iPad see a one-way, read-only copy of this repo in OneDrive: `C:\Users\Madison\OneDrive\AgentWorkspace\claude-codex-template` (OneDrive app → AgentWorkspace → claude-codex-template). The folder is named after the repo folder. It excludes `.git`, `node_modules`, `.env*`, `*.pem` and `*.key`.
 - Save and edit files only in this repo, never in the OneDrive copy. Edits made in the copy are not synced back and get overwritten. Files deleted in the repo stay in the copy until removed there by hand.
 - After each commit, Claude or the user refreshes the copy. Codex's sandbox cannot write to OneDrive. Exit codes 0–7 mean success:
   `$r = (git rev-parse --show-toplevel) -replace '/','\'; if ($env:OneDrive) { robocopy $r "$env:OneDrive\AgentWorkspace\$(Split-Path -Leaf $r)" /E /XD .git node_modules /XF .env* *.pem *.key /NFL /NDL /NJH /NJS /NP }`
