@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#121820">
+  <title>Powerlifting Tracker</title>
+  <link rel="icon" href="./icons/icon-192.png" type="image/png">
+  <link rel="manifest" href="./manifest.json">
+  <link rel="stylesheet" href="./style.css">
+  <script defer src="./app.js"></script>
+</head>
+<body>
+  <main>
+    <h1>Powerlifting Tracker</h1>
+    <p>Log your next set. All weights in kg.</p>
+    <form id="set-form" novalidate>
+      <fieldset>
+        <legend>Lift</legend>
+        <div class="lifts">
+          <button type="button" data-lift="squat" aria-pressed="true">Squat</button>
+          <button type="button" data-lift="bench" aria-pressed="false">Bench</button>
+          <button type="button" data-lift="deadlift" aria-pressed="false">Deadlift</button>
+        </div>
+      </fieldset>
+      <label for="weight">Weight (kg)</label>
+      <input id="weight" type="number" inputmode="decimal" min="0" max="1000" step="any" required>
+      <label for="reps">Reps</label>
+      <input id="reps" type="number" inputmode="numeric" min="1" max="20" step="1" required>
+      <button id="save" class="primary" type="submit" disabled>Save set</button>
+    </form>
+    <p id="message" role="alert"></p>
+    <section id="result" aria-live="polite" hidden>
+      <h2>Last saved set · estimated 1RM</h2>
+      <p id="result-text"></p>
+    </section>
+    <section aria-labelledby="today-heading">
+      <h2 id="today-heading">Today's sets</h2>
+      <p id="empty">Loading sets…</p>
+      <ul id="sets"></ul>
+    </section>
+    <button id="export" type="button" disabled>Export to JSON</button>
+  </main>
+</body>
+</html>

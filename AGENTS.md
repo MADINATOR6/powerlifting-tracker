@@ -1,14 +1,28 @@
 # Project
 
-Not set. When this template is applied to a real repository, fill Project, Stack, Folder Map and Commands from verified inspection only.
+Powerlifting Tracker: a mobile-first, offline-capable Progressive Web App for personal powerlifting tracking on a Samsung Android phone (Chrome or Samsung Internet). It is hosted from a URL (GitHub Pages or Netlify) and installed to the home screen. Do not rely on opening the HTML from OneDrive; Android's OneDrive viewer intercepts HTML files.
+
+Planned scope, delivered in milestones:
+- M1: app shell, squat/bench/deadlift set logger (weight × reps), e1RM, IndexedDB persistence, JSON export.
+- M2: Chart.js progress charts (e1RM per lift over time) and weekly tonnage per muscle group.
+- M3: body tracking (bodyweight, measurements, composition) and a training calendar.
+- Later: RPE, JSON import, PR board with total, quick-entry polish.
+
+Hard constraints: no build step, no framework, no `package.json`, no `node_modules`, no npm installs, no external API calls, cloud services or logins. IndexedDB is the primary store; backup and restore go through JSON files (the user keeps them in OneDrive). Dark mode by default, large touch targets.
 
 # Stack
 
-Not set.
+- Vanilla HTML, CSS and JavaScript (ES2020+, no transpiling, no bundler).
+- IndexedDB via the native API for data.
+- PWA: `manifest.json` (192px and 512px icons) and a service worker for offline caching.
+- Chart.js, vendored locally in the repo (from M2), never loaded from a CDN.
+- Static hosting only (GitHub Pages or Netlify).
 
 # Folder Map
 
-Not set.
+- `AGENTS.md`, `CLAUDE.md`, `BOOTSTRAP.md`, `FRICTION.md`, `TASK.md`, `.codex/`: workflow files from the template. Only AGENTS.md and TASK.md change for app work.
+- `hello.js`, `hello.test.js`: leftover template smoke test, unrelated to the app.
+- App files are created at the repo root from M1 (planned, not yet present): `index.html`, `app.js`, `style.css`, `manifest.json`, `service-worker.js`, `icons/`. A vendored Chart.js goes in `vendor/` from M2.
 
 # Commands
 
