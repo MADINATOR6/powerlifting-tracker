@@ -21,7 +21,6 @@ Hard constraints: no build step, no framework, no `package.json`, no `node_modul
 # Folder Map
 
 - `AGENTS.md`, `CLAUDE.md`, `BOOTSTRAP.md`, `FRICTION.md`, `TASK.md`, `.codex/`: workflow files from the template. Only AGENTS.md and TASK.md change for app work.
-- `hello.js`, `hello.test.js`: leftover template smoke test, unrelated to the app.
 - App files are created at the repo root from M1 (planned, not yet present): `index.html`, `app.js`, `style.css`, `manifest.json`, `service-worker.js`, `icons/`. A vendored Chart.js goes in `vendor/` from M2.
 
 # Commands
