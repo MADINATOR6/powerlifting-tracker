@@ -37,7 +37,16 @@ li { margin-bottom: 8px; line-height: 1.6; }
 .range-error:empty, #settings-message:empty { display: none; }
 .tabs { display: flex; gap: 8px; margin-bottom: 16px; }
 .tabs button { flex: 1; min-width: 0; }
-#pr-board { width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 14px; }
+#pr-board { width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 16px; }
 #pr-board th, #pr-board td { text-align: left; vertical-align: top; padding: 10px 6px; border-bottom: 1px solid #2d3a4a; overflow-wrap: anywhere; }
 #pr-board th:first-child { width: 24%; }
 .chart-box { height: 260px; position: relative; min-width: 0; }
+.body-maps { display: flex; gap: 16px; }
+.body-maps figure { flex: 1; min-width: 0; max-width: 50%; margin: 0; text-align: center; }
+.body-maps svg { display: block; width: 100%; height: auto; }
+.body-maps figcaption { margin-top: 8px; }
+.muscle { stroke: #121820; stroke-width: 1; }
+.legend { margin: 24px 0; }
+.legend-bar { height: 16px; border-radius: 8px; background: linear-gradient(to right, hsl(0, 70%, 45%), hsl(60, 70%, 45%), hsl(120, 70%, 45%)); }
+.legend-labels { display: flex; justify-content: space-between; margin-top: 8px; }
+.swatch { display: inline-block; width: 14px; height: 14px; margin-right: 8px; border-radius: 50%; }

@@ -2,6 +2,57 @@
 
 const INCREMENTS = { squat: 5, bench: 2.5, deadlift: 5 };
 
+const MUSCLES = {
+  quads: "Quads", hamstrings: "Hamstrings", glutes: "Glutes", "lower-back": "Lower back",
+  chest: "Chest", triceps: "Triceps", "front-delts": "Front delts", "upper-back": "Upper back"
+};
+
+const EXERCISE_MUSCLES = {
+  squat: { quads: 1, glutes: 1, "lower-back": 0.5, hamstrings: 0.5 },
+  bench: { chest: 1, triceps: 0.5, "front-delts": 0.5 },
+  deadlift: { hamstrings: 1, glutes: 1, "lower-back": 1, "upper-back": 0.5, quads: 0.5 },
+  "front-squat": { quads: 1, glutes: 0.5, "upper-back": 0.5 },
+  "pause-squat": { quads: 1, glutes: 1, "lower-back": 0.5, hamstrings: 0.5 },
+  "romanian-deadlift": { hamstrings: 1, glutes: 0.5, "lower-back": 0.5 },
+  "good-morning": { hamstrings: 1, "lower-back": 1, glutes: 0.5 },
+  "close-grip-bench": { triceps: 1, chest: 0.5, "front-delts": 0.5 },
+  "overhead-press": { "front-delts": 1, triceps: 0.5 },
+  dip: { triceps: 1, chest: 0.5, "front-delts": 0.5 },
+  "barbell-row": { "upper-back": 1, "lower-back": 0.5 },
+  "pull-up": { "upper-back": 1 },
+  "leg-press": { quads: 1, glutes: 0.5 },
+  "hip-thrust": { glutes: 1, hamstrings: 0.5 },
+  "back-extension": { "lower-back": 1, glutes: 0.5, hamstrings: 0.5 }
+};
+
+function muscleRecovery(records, now) {
+  const hour = 60 * 60 * 1000;
+  const recovery = Object.fromEntries(Object.keys(MUSCLES).map(key =>
+    [key, { hoursSince: null, weeklySets: 0, recoveryHours: 48, fatigue: 0 }]));
+  for (const record of records) {
+    const time = Date.parse(record.createdAt);
+    if (!Number.isFinite(time) || time > now ||
+        !Object.prototype.hasOwnProperty.call(EXERCISE_MUSCLES, record.lift)) continue;
+    for (const [key, factor] of Object.entries(EXERCISE_MUSCLES[record.lift])) {
+      if (factor <= 0) continue;
+      const muscle = recovery[key];
+      const hoursSince = (now - time) / hour;
+      muscle.hoursSince = muscle.hoursSince === null ? hoursSince : Math.min(muscle.hoursSince, hoursSince);
+      if (time > now - 7 * 24 * hour) muscle.weeklySets += factor;
+    }
+  }
+  for (const muscle of Object.values(recovery)) {
+    muscle.recoveryHours = 48 + 4 * Math.min(muscle.weeklySets, 12);
+    muscle.fatigue = muscle.hoursSince === null ? 0 :
+      Math.max(0, Math.min(1, 1 - muscle.hoursSince / muscle.recoveryHours));
+  }
+  return recovery;
+}
+
+function fatigueColour(fatigue) {
+  return `hsl(${Math.round(120 * (1 - fatigue))}, 70%, 45%)`;
+}
+
 function floorToIncrement(value, step = 2.5) {
   const quotient = value / step;
   return Math.floor(quotient + Number.EPSILON * Math.max(1, Math.abs(quotient)) * 4) * step;
@@ -168,6 +219,7 @@ let database;
 let settings = loadSettings();
 let coachRender = 0;
 let analystRender = 0;
+let recoveryRender = 0;
 let charts = [];
 let chartDefaultsSet = false;
 
@@ -265,19 +317,55 @@ async function renderAnalyst() {
   }
 }
 
+async function renderRecovery() {
+  const render = ++recoveryRender;
+  if (!database) return;
+  try {
+    const records = await readSets();
+    if (render !== recoveryRender) return;
+    const recovery = muscleRecovery(records, Date.now());
+    document.querySelectorAll("#screen-recovery svg [data-muscle]").forEach(shape => {
+      shape.setAttribute("fill", fatigueColour(recovery[shape.dataset.muscle].fatigue));
+    });
+    const list = document.querySelector("#recovery-list");
+    list.replaceChildren();
+    for (const [key, label] of Object.entries(MUSCLES)) {
+      const { hoursSince, weeklySets, fatigue } = recovery[key];
+      const item = document.createElement("li");
+      item.dataset.muscle = key;
+      const swatch = document.createElement("span");
+      swatch.className = "swatch";
+      swatch.style.backgroundColor = fatigueColour(fatigue);
+      swatch.setAttribute("aria-hidden", "true");
+      const ago = hoursSince < 48 ? `${Math.round(hoursSince)} h ago` : `${Math.floor(hoursSince / 24)} d ago`;
+      const text = hoursSince === null ? `${label}: rested · no sets logged` :
+        `${label}: ${Math.round(fatigue * 100)}% fatigued · last trained ${ago} · ${Number(weeklySets.toFixed(1))} sets this week`;
+      item.append(swatch, document.createTextNode(text));
+      list.append(item);
+    }
+  } catch (error) {
+    if (render !== recoveryRender) return;
+    showError(`Could not load recovery: ${error.message}`);
+  }
+}
+
 document.querySelectorAll("[data-screen]").forEach(button => {
   button.addEventListener("click", () => {
-    const analyst = button.dataset.screen === "analyst";
-    document.querySelector("#screen-log").hidden = analyst;
-    document.querySelector("#screen-analyst").hidden = !analyst;
+    const screen = button.dataset.screen;
+    const active = document.querySelector(`#screen-${screen}`);
+    document.querySelectorAll('[id^="screen-"]').forEach(panel => {
+      panel.hidden = panel !== active;
+    });
     // Keep the existing alert visible on whichever screen is active.
-    if (analyst) document.querySelector("#screen-analyst").prepend(message);
-    else form.after(message);
+    if (screen === "log") form.after(message);
+    else active.prepend(message);
     document.querySelectorAll("[data-screen]").forEach(toggle => {
       toggle.setAttribute("aria-pressed", String(toggle === button));
     });
-    if (analyst) renderAnalyst();
+    if (screen === "analyst") renderAnalyst();
     else ++analystRender;
+    if (screen === "recovery") renderRecovery();
+    else ++recoveryRender;
   });
 });
 
@@ -480,6 +568,7 @@ async function initialize() {
     await renderCoach();
     exportButton.disabled = false;
     if (!document.querySelector("#screen-analyst").hidden) await renderAnalyst();
+    if (!document.querySelector("#screen-recovery").hidden) await renderRecovery();
   } catch (error) {
     document.querySelector("#empty").textContent = "Sets could not be loaded.";
     showError(`Could not load storage: ${error.message}`);

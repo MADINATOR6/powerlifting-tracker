@@ -17,6 +17,7 @@
     <nav class="tabs" aria-label="Screens">
       <button type="button" data-screen="log" aria-pressed="true">Log</button>
       <button type="button" data-screen="analyst" aria-pressed="false">Analyst</button>
+      <button type="button" data-screen="recovery" aria-pressed="false">Recovery</button>
     </nav>
     <div id="screen-log">
     <p>Log your next set. All weights in kg.</p>
@@ -110,6 +111,49 @@
           <div class="chart-box"><canvas id="balance-chart" role="img" aria-label="Your lift shares compared with typical shares"></canvas></div>
         </div>
       </div>
+    </div>
+    <div id="screen-recovery" hidden>
+      <h2>Recovery</h2>
+      <p>Red is fatigued, green is rested. Based on hours since each muscle group was trained and this week's volume.</p>
+      <div class="body-maps">
+        <figure>
+          <svg viewBox="0 0 120 260" role="img" aria-label="Front body map">
+            <g fill="#263242" stroke="#718096">
+              <ellipse cx="60" cy="20" rx="14" ry="17"/>
+              <path d="M53 36 L53 44 L37 49 Q29 51 25 66 L13 123 L16 139 L24 137 L27 123 L37 87 L39 125 L34 150 L37 205 L34 247 Q43 253 51 248 L55 207 L60 163 L65 207 L69 248 Q77 253 86 247 L83 205 L86 150 L81 125 L83 87 L93 123 L96 137 L104 139 L107 123 L95 66 Q91 51 83 49 L67 44 L67 36 Z"/>
+            </g>
+            <path class="muscle" data-muscle="chest" fill="hsl(120, 70%, 45%)" d="M40 59 Q49 55 58 61 L58 80 Q48 84 39 77 Z"><title>Chest</title></path>
+            <path class="muscle" data-muscle="chest" fill="hsl(120, 70%, 45%)" d="M80 59 Q71 55 62 61 L62 80 Q72 84 81 77 Z"><title>Chest</title></path>
+            <ellipse class="muscle" data-muscle="front-delts" fill="hsl(120, 70%, 45%)" cx="33" cy="64" rx="7" ry="13"><title>Front delts</title></ellipse>
+            <ellipse class="muscle" data-muscle="front-delts" fill="hsl(120, 70%, 45%)" cx="87" cy="64" rx="7" ry="13"><title>Front delts</title></ellipse>
+            <path class="muscle" data-muscle="quads" fill="hsl(120, 70%, 45%)" d="M39 145 Q47 139 56 148 L51 192 Q46 207 40 194 Z"><title>Quads</title></path>
+            <path class="muscle" data-muscle="quads" fill="hsl(120, 70%, 45%)" d="M81 145 Q73 139 64 148 L69 192 Q74 207 80 194 Z"><title>Quads</title></path>
+          </svg>
+          <figcaption>Front</figcaption>
+        </figure>
+        <figure>
+          <svg viewBox="0 0 120 260" role="img" aria-label="Back body map">
+            <g fill="#263242" stroke="#718096">
+              <ellipse cx="60" cy="20" rx="14" ry="17"/>
+              <path d="M53 36 L53 44 L37 49 Q29 51 25 66 L13 123 L16 139 L24 137 L27 123 L37 87 L39 125 L34 150 L37 205 L34 247 Q43 253 51 248 L55 207 L60 163 L65 207 L69 248 Q77 253 86 247 L83 205 L86 150 L81 125 L83 87 L93 123 L96 137 L104 139 L107 123 L95 66 Q91 51 83 49 L67 44 L67 36 Z"/>
+            </g>
+            <path class="muscle" data-muscle="upper-back" fill="hsl(120, 70%, 45%)" d="M40 55 L53 49 L60 56 L67 49 L80 55 L78 86 L60 101 L42 86 Z"><title>Upper back</title></path>
+            <path class="muscle" data-muscle="lower-back" fill="hsl(120, 70%, 45%)" d="M44 94 L60 104 L76 94 L77 124 L43 124 Z"><title>Lower back</title></path>
+            <ellipse class="muscle" data-muscle="glutes" fill="hsl(120, 70%, 45%)" cx="47" cy="139" rx="12" ry="15"><title>Glutes</title></ellipse>
+            <ellipse class="muscle" data-muscle="glutes" fill="hsl(120, 70%, 45%)" cx="73" cy="139" rx="12" ry="15"><title>Glutes</title></ellipse>
+            <path class="muscle" data-muscle="hamstrings" fill="hsl(120, 70%, 45%)" d="M39 157 L55 157 L51 193 Q46 202 40 194 Z"><title>Hamstrings</title></path>
+            <path class="muscle" data-muscle="hamstrings" fill="hsl(120, 70%, 45%)" d="M81 157 L65 157 L69 193 Q74 202 80 194 Z"><title>Hamstrings</title></path>
+            <path class="muscle" data-muscle="triceps" fill="hsl(120, 70%, 45%)" d="M27 75 L36 78 L29 104 L22 101 Z"><title>Triceps</title></path>
+            <path class="muscle" data-muscle="triceps" fill="hsl(120, 70%, 45%)" d="M93 75 L84 78 L91 104 L98 101 Z"><title>Triceps</title></path>
+          </svg>
+          <figcaption>Back</figcaption>
+        </figure>
+      </div>
+      <div class="legend">
+        <div class="legend-bar" aria-hidden="true"></div>
+        <div class="legend-labels"><span>Fatigued</span><span>Rested</span></div>
+      </div>
+      <ul id="recovery-list"></ul>
     </div>
   </main>
 </body>
