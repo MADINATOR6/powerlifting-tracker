@@ -70,6 +70,67 @@ function sessionSuggestion(records, lift, today, range) {
   return { date, total, hitTop, baseWeight, suggestedWeight: baseWeight + (increase ? INCREMENTS[lift] : 0), increase };
 }
 
+const ATTEMPT_PERCENTS = {
+  conservative: [0.88, 0.94, 0.98], standard: [0.91, 0.96, 1.00], aggressive: [0.93, 0.98, 1.025]
+};
+const WARMUP_STEPS = [[0.40, 5], [0.55, 3], [0.70, 2], [0.80, 1], [0.90, 1]];
+const WEIGHT_CLASSES = {
+  men: ["59", "66", "74", "83", "93", "105", "120", "120+"],
+  women: ["47", "52", "57", "63", "69", "76", "84", "84+"]
+};
+
+function attemptPlan(max, strategy) {
+  return ATTEMPT_PERCENTS[strategy].reduce((plan, percent) => {
+    const weight = floorToIncrement(max * percent);
+    plan.push(plan.length ? Math.max(weight, plan[plan.length - 1] + 2.5) : weight);
+    return plan;
+  }, []);
+}
+
+function warmupSets(opener) {
+  return WARMUP_STEPS.reduce((sets, [fraction, reps]) => {
+    const weight = Math.max(20, floorToIncrement(opener * fraction));
+    if (weight < opener && weight !== sets[sets.length - 1]?.weight) sets.push({ weight, reps });
+    return sets;
+  }, []);
+}
+
+function classStatus(bodyweight, weightClass) {
+  const limit = weightClass.endsWith("+") ? null : Number(weightClass);
+  return { limit, diff: limit === null ? null : bodyweight - limit };
+}
+
+const MEET_KEY = "powerlifting-tracker-meet";
+
+function defaultMeet() {
+  return { maxes: { squat: null, bench: null, deadlift: null }, strategy: "standard",
+    division: "men", weightClass: "83", bodyweights: [] };
+}
+
+function validMeetMax(value) {
+  return Number.isFinite(value) && value > 0 && value <= 1000;
+}
+
+function loadMeet() {
+  try {
+    const stored = JSON.parse(localStorage.getItem(MEET_KEY));
+    if (!stored || !["squat", "bench", "deadlift"].every(lift =>
+      stored.maxes?.[lift] === null || validMeetMax(stored.maxes?.[lift])) ||
+      !Object.prototype.hasOwnProperty.call(ATTEMPT_PERCENTS, stored.strategy) ||
+      !Object.prototype.hasOwnProperty.call(WEIGHT_CLASSES, stored.division) ||
+      !WEIGHT_CLASSES[stored.division].includes(stored.weightClass) ||
+      !Array.isArray(stored.bodyweights) || !stored.bodyweights.every(entry =>
+        entry && typeof entry.date === "string" && /^\d{4}-\d{2}-\d{2}$/.test(entry.date) &&
+        Number.isFinite(Date.parse(entry.date)) && new Date(entry.date).toISOString().slice(0, 10) === entry.date &&
+        Number.isFinite(entry.kg) && entry.kg >= 20 && entry.kg <= 300)) return defaultMeet();
+    return { maxes: { squat: stored.maxes.squat, bench: stored.maxes.bench, deadlift: stored.maxes.deadlift },
+      strategy: stored.strategy, division: stored.division, weightClass: stored.weightClass,
+      bodyweights: stored.bodyweights.map(({ date, kg }) => ({ date, kg })) };
+  } catch {
+    return defaultMeet();
+  }
+}
+
 function nextSetSuggestion(weight, rpe) {
   return typeof rpe === "number" && rpe >= 9
     ? { dropped: true, weight: floorToIncrement(weight * 0.95) }
@@ -222,6 +283,157 @@ let analystRender = 0;
 let recoveryRender = 0;
 let charts = [];
 let chartDefaultsSet = false;
+let meet = loadMeet();
+
+function saveMeet() {
+  const status = document.querySelector("#meet-message");
+  try {
+    localStorage.setItem(MEET_KEY, JSON.stringify(meet));
+    status.textContent = "";
+  } catch (error) {
+    status.textContent = `Could not save meet data; changes are only available until reload: ${error.message}`;
+  }
+}
+
+function applyMeetMaxes() {
+  for (const lift of Object.keys(names)) {
+    const input = document.querySelector(`#meet-${lift}`);
+    input.value = meet.maxes[lift] ?? "";
+    input.setAttribute("aria-invalid", "false");
+    document.querySelector(`#meet-${lift}-error`).textContent = "";
+  }
+}
+
+function renderMeet() {
+  document.querySelectorAll("[data-strategy]").forEach(button => {
+    button.setAttribute("aria-pressed", String(button.dataset.strategy === meet.strategy));
+  });
+  const body = document.querySelector("#attempt-table tbody");
+  const warmups = document.querySelector("#warmup-list");
+  body.replaceChildren();
+  warmups.replaceChildren();
+  let total = 0;
+  for (const lift of Object.keys(names)) {
+    const plan = meet.maxes[lift] === null ? null : attemptPlan(meet.maxes[lift], meet.strategy);
+    const row = document.createElement("tr");
+    const heading = document.createElement("th");
+    heading.scope = "row";
+    heading.textContent = names[lift];
+    row.append(heading);
+    for (const weight of plan || [null, null, null]) {
+      const cell = document.createElement("td");
+      cell.textContent = weight === null ? "—" : `${weight} kg`;
+      row.append(cell);
+    }
+    body.append(row);
+    if (plan) {
+      total += plan[2];
+      const item = document.createElement("li");
+      item.textContent = `${names[lift]} · opener ${plan[0]} kg: ${warmupSets(plan[0])
+        .map(set => `${set.weight}×${set.reps}`).join(" · ")}`;
+      warmups.append(item);
+    }
+  }
+  if (!warmups.children.length) {
+    const item = document.createElement("li");
+    item.textContent = "Enter a max to see warm-ups.";
+    warmups.append(item);
+  }
+  document.querySelector("#attempt-total").textContent = Object.values(meet.maxes).every(value => value !== null)
+    ? `Projected total: ${total} kg` : "Projected total: enter all three maxes.";
+  document.querySelector("#meet-division").value = meet.division;
+  const classes = document.querySelector("#meet-class");
+  classes.replaceChildren(...WEIGHT_CLASSES[meet.division].map(value => {
+    const option = document.createElement("option");
+    option.value = value;
+    option.textContent = `${value} kg`;
+    return option;
+  }));
+  classes.value = meet.weightClass;
+  const entries = [...meet.bodyweights].sort((a, b) => b.date.localeCompare(a.date));
+  const latest = entries[0];
+  let status = "Log your bodyweight to track your class.";
+  if (latest) {
+    const { diff } = classStatus(latest.kg, meet.weightClass);
+    const rounded = diff === null ? null : Number(diff.toFixed(1));
+    const comparison = rounded === null ? "no upper limit" : rounded === 0 ? "exactly at the limit" :
+      `${Math.abs(rounded).toFixed(1)} kg ${rounded > 0 ? "over" : "under"} the limit`;
+    status = `${meet.weightClass} kg class: ${latest.kg.toFixed(1)} kg on ${latest.date}, ${comparison}.`;
+  }
+  document.querySelector("#class-status").textContent = status;
+  document.querySelector("#bodyweight-list").replaceChildren(...entries.slice(0, 5).map(entry => {
+    const item = document.createElement("li");
+    item.textContent = `${entry.date} · ${entry.kg.toFixed(1)} kg`;
+    return item;
+  }));
+}
+
+applyMeetMaxes();
+document.querySelectorAll("[data-meet-max]").forEach(input => {
+  input.addEventListener("input", () => {
+    const value = input.value === "" ? null : Number(input.value);
+    const valid = !input.validity.badInput && (value === null || validMeetMax(value));
+    input.setAttribute("aria-invalid", String(!valid));
+    document.querySelector(`#meet-${input.dataset.meetMax}-error`).textContent = valid ? "" :
+      "Enter a max above 0 and up to 1000 kg. The last valid max is still active.";
+    if (!valid) return;
+    meet.maxes[input.dataset.meetMax] = value;
+    saveMeet();
+    renderMeet();
+  });
+});
+document.querySelectorAll("[data-strategy]").forEach(button => {
+  button.addEventListener("click", () => {
+    meet.strategy = button.dataset.strategy;
+    saveMeet();
+    renderMeet();
+  });
+});
+document.querySelector("#meet-use-prs").addEventListener("click", async () => {
+  try {
+    if (!database) throw new Error("Set storage is not ready. Try again once sets have loaded.");
+    const prs = prBoard(await readSets());
+    const skipped = [];
+    for (const lift of Object.keys(names)) {
+      if (!prs[lift]) continue;
+      const value = Number(prs[lift].bestE1rm.toFixed(1));
+      if (validMeetMax(value)) meet.maxes[lift] = value;
+      else skipped.push(names[lift]);
+    }
+    applyMeetMaxes();
+    saveMeet();
+    renderMeet();
+    if (skipped.length) document.querySelector("#meet-message").textContent +=
+      ` ${skipped.join(", ")} e1RM exceeds 1000 kg; the current max was kept.`;
+  } catch (error) {
+    document.querySelector("#meet-message").textContent = `Could not load best e1RMs: ${error.message}`;
+  }
+});
+document.querySelector("#meet-division").addEventListener("change", event => {
+  meet.division = event.target.value;
+  meet.weightClass = meet.division === "men" ? "83" : "63";
+  saveMeet();
+  renderMeet();
+});
+document.querySelector("#meet-class").addEventListener("change", event => {
+  meet.weightClass = event.target.value;
+  saveMeet();
+  renderMeet();
+});
+document.querySelector("#bodyweight-form").addEventListener("submit", event => {
+  event.preventDefault();
+  const input = document.querySelector("#bodyweight");
+  const kg = Number(input.value);
+  const valid = !input.validity.badInput && Number.isFinite(kg) && kg >= 20 && kg <= 300;
+  input.setAttribute("aria-invalid", String(!valid));
+  document.querySelector("#bodyweight-error").textContent = valid ? "" : "Enter a bodyweight from 20 to 300 kg.";
+  if (!valid) return;
+  const date = localDate();
+  meet.bodyweights = meet.bodyweights.filter(entry => entry.date !== date);
+  meet.bodyweights.push({ date, kg });
+  saveMeet();
+  renderMeet();
+});
 
 function renderPrBoard(prs) {
   const body = document.querySelector("#pr-board tbody");
@@ -366,6 +578,7 @@ document.querySelectorAll("[data-screen]").forEach(button => {
     else ++analystRender;
     if (screen === "recovery") renderRecovery();
     else ++recoveryRender;
+    if (screen === "meet") renderMeet();
   });
 });
 

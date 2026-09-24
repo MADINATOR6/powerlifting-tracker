@@ -50,3 +50,14 @@ li { margin-bottom: 8px; line-height: 1.6; }
 .legend-bar { height: 16px; border-radius: 8px; background: linear-gradient(to right, hsl(0, 70%, 45%), hsl(60, 70%, 45%), hsl(120, 70%, 45%)); }
 .legend-labels { display: flex; justify-content: space-between; margin-top: 8px; }
 .swatch { display: inline-block; width: 14px; height: 14px; margin-right: 8px; border-radius: 50%; }
+/* Accommodate the fourth screen tab without reducing touch-target height. */
+.tabs:has([data-screen="meet"]) { gap: 4px; }
+.tabs:has([data-screen="meet"]) button { flex: 1 1 auto; padding-inline: 4px; }
+#screen-meet select { font: inherit; min-height: 48px; width: 100%; border: 1px solid #718096; border-radius: 8px; background: #1b2531; color: #edf2f7; padding: 12px; margin-bottom: 16px; }
+#screen-meet button { min-height: 48px; }
+.meet-strategies { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0; }
+.meet-strategies button { flex: 1 1 auto; }
+#attempt-table { width: 100%; table-layout: fixed; border-collapse: collapse; }
+#attempt-table th, #attempt-table td { text-align: left; padding: 10px 4px; border-bottom: 1px solid #2d3a4a; overflow-wrap: anywhere; }
+.meet-error, #meet-message { color: #ffb4b4; }
+.meet-error:empty, #meet-message:empty { display: none; }

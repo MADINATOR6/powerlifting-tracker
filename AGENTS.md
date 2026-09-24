@@ -7,7 +7,7 @@ Direction: Liftoff-style powerlifting app with three pillars: Intelligent Coach,
 - M2 (done): Intelligent Coach core: optional per-set RPE (setting, default off), double-progression target per lift from its last session, 5% next-set drop after RPE 9+.
 - M3 (done): Analyst dashboard (second screen): vendored Chart.js, e1RM line chart, weekly tonnage bars, squat/bench/deadlift imbalance radar, PR board with total.
 - M4 (done): Recovery heatmap (third screen): inline SVG body map (front/back) coloured by muscle-group fatigue from hours since trained and weekly sets, via an exercise-to-muscle mapping.
-- M5: Meet-day tools: attempt calculator, warm-up generator, weight-class manager.
+- M5 (done): Meet-day tools (fourth screen): attempt calculator (conservative/standard/aggressive), warm-up generator from openers, IPF weight-class manager. Meet data and bodyweights live in `localStorage` (`powerlifting-tracker-meet`), not yet in the JSON export.
 - Later: deload coach, JSON import, quick-entry polish.
 
 Hard constraints: no build step, no framework, no `package.json`, no `node_modules`, no npm installs, no external API calls, cloud services or logins. IndexedDB is the primary store; backup and restore go through JSON files (the user keeps them in OneDrive). Dark mode by default, large touch targets.
@@ -15,7 +15,7 @@ Hard constraints: no build step, no framework, no `package.json`, no `node_modul
 # Stack
 
 - Vanilla HTML, CSS and JavaScript (ES2020+, no transpiling, no bundler).
-- IndexedDB via the native API for data. `localStorage` (`powerlifting-tracker-settings`) holds UI settings only.
+- IndexedDB via the native API for data. `localStorage` holds UI settings (`powerlifting-tracker-settings`) and meet data (`powerlifting-tracker-meet`).
 - PWA: `manifest.json` (192px and 512px icons) and a service worker for offline caching.
 - Chart.js, vendored locally in the repo (from M3), never loaded from a CDN.
 - Static hosting only (GitHub Pages or Netlify).
@@ -25,7 +25,7 @@ Hard constraints: no build step, no framework, no `package.json`, no `node_modul
 - `AGENTS.md`, `CLAUDE.md`, `BOOTSTRAP.md`, `FRICTION.md`, `TASK.md`, `.codex/`: workflow files from the template. Only AGENTS.md and TASK.md change for app work.
 - App files at the repo root: `index.html`, `app.js`, `style.css`, `manifest.json`, `service-worker.js`, `icons/`.
 - `vendor/`: `chart.umd.min.js` (Chart.js 4.5.1 UMD, from the npm tarball) and its MIT licence `chart.js-LICENSE.md`. Never edit; replace only as a deliberate upgrade.
-- Bump `CACHE` in `service-worker.js` (currently `pl-shell-v3`) whenever a shell file changes, or installed apps keep the old version.
+- Bump `CACHE` in `service-worker.js` (currently `pl-shell-v4`) whenever a shell file changes, or installed apps keep the old version.
 
 # Commands
 

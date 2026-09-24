@@ -18,6 +18,7 @@
       <button type="button" data-screen="log" aria-pressed="true">Log</button>
       <button type="button" data-screen="analyst" aria-pressed="false">Analyst</button>
       <button type="button" data-screen="recovery" aria-pressed="false">Recovery</button>
+      <button type="button" data-screen="meet" aria-pressed="false">Meet</button>
     </nav>
     <div id="screen-log">
     <p>Log your next set. All weights in kg.</p>
@@ -154,6 +155,51 @@
         <div class="legend-labels"><span>Fatigued</span><span>Rested</span></div>
       </div>
       <ul id="recovery-list"></ul>
+    </div>
+    <div id="screen-meet" hidden>
+      <p id="meet-message" role="alert"></p>
+      <section id="attempts">
+        <h2>Attempt calculator</h2>
+        <label for="meet-squat">Squat max (kg)</label>
+        <input id="meet-squat" data-meet-max="squat" type="number" inputmode="decimal" min="0" max="1000" step="any" aria-describedby="meet-squat-error">
+        <p id="meet-squat-error" class="meet-error" role="alert"></p>
+        <label for="meet-bench">Bench max (kg)</label>
+        <input id="meet-bench" data-meet-max="bench" type="number" inputmode="decimal" min="0" max="1000" step="any" aria-describedby="meet-bench-error">
+        <p id="meet-bench-error" class="meet-error" role="alert"></p>
+        <label for="meet-deadlift">Deadlift max (kg)</label>
+        <input id="meet-deadlift" data-meet-max="deadlift" type="number" inputmode="decimal" min="0" max="1000" step="any" aria-describedby="meet-deadlift-error">
+        <p id="meet-deadlift-error" class="meet-error" role="alert"></p>
+        <button id="meet-use-prs" type="button">Use my best e1RMs</button>
+        <div class="meet-strategies" role="group" aria-label="Attempt strategy">
+          <button type="button" data-strategy="conservative" aria-pressed="false">Conservative</button>
+          <button type="button" data-strategy="standard" aria-pressed="true">Standard</button>
+          <button type="button" data-strategy="aggressive" aria-pressed="false">Aggressive</button>
+        </div>
+        <table id="attempt-table">
+          <thead><tr><th scope="col">Lift</th><th scope="col">Opener</th><th scope="col">Second</th><th scope="col">Third</th></tr></thead>
+          <tbody></tbody>
+        </table>
+        <p id="attempt-total" aria-live="polite"></p>
+      </section>
+      <section id="warmups">
+        <h2>Warm-ups</h2>
+        <ul id="warmup-list"></ul>
+      </section>
+      <section id="weight-class">
+        <h2>Weight class</h2>
+        <label for="meet-division">Division</label>
+        <select id="meet-division"><option value="men">Men</option><option value="women">Women</option></select>
+        <label for="meet-class">Class</label>
+        <select id="meet-class"></select>
+        <form id="bodyweight-form" novalidate>
+          <label for="bodyweight">Bodyweight (kg)</label>
+          <input id="bodyweight" type="number" inputmode="decimal" min="20" max="300" step="any" required aria-describedby="bodyweight-error">
+          <p id="bodyweight-error" class="meet-error" role="alert"></p>
+          <button type="submit">Log bodyweight</button>
+        </form>
+        <p id="class-status" aria-live="polite"></p>
+        <ul id="bodyweight-list"></ul>
+      </section>
     </div>
   </main>
 </body>
