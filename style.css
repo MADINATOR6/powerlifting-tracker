@@ -24,3 +24,14 @@ section { margin: 24px 0; }
 #result p { margin-bottom: 0; }
 ul { list-style: none; padding: 0; }
 li { margin-bottom: 8px; line-height: 1.6; }
+#rpe { font: inherit; min-height: 48px; width: 100%; border: 1px solid #718096; border-radius: 8px; background: #1b2531; color: #edf2f7; padding: 12px; margin-bottom: 16px; }
+#settings { margin-top: 24px; }
+#settings summary { min-height: 48px; padding: 12px 0; cursor: pointer; }
+.checkbox-row { display: flex; align-items: center; gap: 12px; min-height: 48px; cursor: pointer; }
+#rpe-enabled { width: 24px; min-height: 24px; height: 24px; margin: 0; flex-shrink: 0; }
+.rep-range { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; align-items: center; }
+.rep-range label { min-width: 0; }
+.rep-range input { min-width: 0; margin: 8px 0 0; }
+.range-error { grid-column: 1 / -1; margin: 0 0 16px; }
+.range-error, #settings-message { color: #ffb4b4; }
+.range-error:empty, #settings-message:empty { display: none; }

@@ -27,9 +27,29 @@
       <input id="weight" type="number" inputmode="decimal" min="0" max="1000" step="any" required>
       <label for="reps">Reps</label>
       <input id="reps" type="number" inputmode="numeric" min="1" max="20" step="1" required>
+      <div id="rpe-field" hidden>
+        <label for="rpe">RPE</label>
+        <select id="rpe">
+          <option value="">—</option>
+          <option value="6">6 · 4 RIR</option>
+          <option value="6.5">6.5 · 3.5 RIR</option>
+          <option value="7">7 · 3 RIR</option>
+          <option value="7.5">7.5 · 2.5 RIR</option>
+          <option value="8">8 · 2 RIR</option>
+          <option value="8.5">8.5 · 1.5 RIR</option>
+          <option value="9">9 · 1 RIR</option>
+          <option value="9.5">9.5 · 0.5 RIR</option>
+          <option value="10">10 · 0 RIR</option>
+        </select>
+      </div>
       <button id="save" class="primary" type="submit" disabled>Save set</button>
     </form>
     <p id="message" role="alert"></p>
+    <section id="coach" aria-live="polite">
+      <h2>Coach</h2>
+      <p id="session-target">Squat: no earlier session yet. Pick a weight you can lift for 3–5 reps.</p>
+      <p id="next-set" hidden></p>
+    </section>
     <section id="result" aria-live="polite" hidden>
       <h2>Last saved set · estimated 1RM</h2>
       <p id="result-text"></p>
@@ -40,6 +60,30 @@
       <ul id="sets"></ul>
     </section>
     <button id="export" type="button" disabled>Export to JSON</button>
+    <details id="settings">
+      <summary>Settings</summary>
+      <label class="checkbox-row"><input id="rpe-enabled" type="checkbox">Log RPE for each set</label>
+      <p>Rep range per lift</p>
+      <div class="rep-range" data-range="squat">
+        <span>Squat</span>
+        <label>Min<input id="squat-min" type="number" inputmode="numeric" min="1" max="20" step="1" value="3" aria-label="Squat minimum reps" aria-describedby="squat-error"></label>
+        <label>Max<input id="squat-max" type="number" inputmode="numeric" min="1" max="20" step="1" value="5" aria-label="Squat maximum reps" aria-describedby="squat-error"></label>
+        <p id="squat-error" class="range-error" role="alert"></p>
+      </div>
+      <div class="rep-range" data-range="bench">
+        <span>Bench</span>
+        <label>Min<input id="bench-min" type="number" inputmode="numeric" min="1" max="20" step="1" value="3" aria-label="Bench minimum reps" aria-describedby="bench-error"></label>
+        <label>Max<input id="bench-max" type="number" inputmode="numeric" min="1" max="20" step="1" value="5" aria-label="Bench maximum reps" aria-describedby="bench-error"></label>
+        <p id="bench-error" class="range-error" role="alert"></p>
+      </div>
+      <div class="rep-range" data-range="deadlift">
+        <span>Deadlift</span>
+        <label>Min<input id="deadlift-min" type="number" inputmode="numeric" min="1" max="20" step="1" value="3" aria-label="Deadlift minimum reps" aria-describedby="deadlift-error"></label>
+        <label>Max<input id="deadlift-max" type="number" inputmode="numeric" min="1" max="20" step="1" value="5" aria-label="Deadlift maximum reps" aria-describedby="deadlift-error"></label>
+        <p id="deadlift-error" class="range-error" role="alert"></p>
+      </div>
+      <p id="settings-message" role="alert"></p>
+    </details>
   </main>
 </body>
 </html>

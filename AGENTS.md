@@ -2,30 +2,34 @@
 
 Powerlifting Tracker: a mobile-first, offline-capable Progressive Web App for personal powerlifting tracking on a Samsung Android phone (Chrome or Samsung Internet). It is hosted from a URL (GitHub Pages or Netlify) and installed to the home screen. Do not rely on opening the HTML from OneDrive; Android's OneDrive viewer intercepts HTML files.
 
-Planned scope, delivered in milestones:
-- M1: app shell, squat/bench/deadlift set logger (weight × reps), e1RM, IndexedDB persistence, JSON export.
-- M2: Chart.js progress charts (e1RM per lift over time) and weekly tonnage per muscle group.
-- M3: body tracking (bodyweight, measurements, composition) and a training calendar.
-- Later: RPE, JSON import, PR board with total, quick-entry polish.
+Direction: Liftoff-style powerlifting app with three pillars: Intelligent Coach, Powerlifting Analyst, Meet-Day tools. Delivered in milestones:
+- M1 (done): app shell, squat/bench/deadlift set logger (weight × reps), e1RM, IndexedDB persistence, JSON export.
+- M2 (done): Intelligent Coach core: optional per-set RPE (setting, default off), double-progression target per lift from its last session, 5% next-set drop after RPE 9+.
+- M3: Analyst dashboard: vendored Chart.js, e1RM line chart, weekly tonnage bars, squat/bench/deadlift imbalance radar, PR board with total.
+- M4: Recovery heatmap: inline SVG body map (front/back) coloured by muscle-group fatigue.
+- M5: Meet-day tools: attempt calculator, warm-up generator, weight-class manager.
+- Later: deload coach, JSON import, quick-entry polish.
 
 Hard constraints: no build step, no framework, no `package.json`, no `node_modules`, no npm installs, no external API calls, cloud services or logins. IndexedDB is the primary store; backup and restore go through JSON files (the user keeps them in OneDrive). Dark mode by default, large touch targets.
 
 # Stack
 
 - Vanilla HTML, CSS and JavaScript (ES2020+, no transpiling, no bundler).
-- IndexedDB via the native API for data.
+- IndexedDB via the native API for data. `localStorage` (`powerlifting-tracker-settings`) holds UI settings only.
 - PWA: `manifest.json` (192px and 512px icons) and a service worker for offline caching.
-- Chart.js, vendored locally in the repo (from M2), never loaded from a CDN.
+- Chart.js, vendored locally in the repo (from M3), never loaded from a CDN.
 - Static hosting only (GitHub Pages or Netlify).
 
 # Folder Map
 
 - `AGENTS.md`, `CLAUDE.md`, `BOOTSTRAP.md`, `FRICTION.md`, `TASK.md`, `.codex/`: workflow files from the template. Only AGENTS.md and TASK.md change for app work.
-- App files are created at the repo root from M1 (planned, not yet present): `index.html`, `app.js`, `style.css`, `manifest.json`, `service-worker.js`, `icons/`. A vendored Chart.js goes in `vendor/` from M2.
+- App files at the repo root: `index.html`, `app.js`, `style.css`, `manifest.json`, `service-worker.js`, `icons/`. A vendored Chart.js goes in `vendor/` from M3.
 
 # Commands
 
-Not set. Add a dev, test, lint, typecheck or build command only after it has run successfully in this repo. Never invent one.
+Add a dev, test, lint, typecheck or build command only after it has run successfully in this repo. Never invent one.
+- Syntax check: `node --check app.js` and `node --check service-worker.js`.
+- Local server: `python -m http.server 8000` from the repo root, then open `http://localhost:8000/`.
 
 # Windows
 
